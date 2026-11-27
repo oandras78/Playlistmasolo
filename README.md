@@ -1,30 +1,98 @@
-# Lejátszási lista másoló
+Playlist Másoló | Playlist Copier
+Magyar | English
 
-M3U/M3U8 listákban szereplő fájlok másolása egy megadott mappába, az eredeti fájlnevekkel.
-Bármilyen karakterrel működik a fájlnevekben (Unicode-os Windows API-k, nincs kódolási gond).
+A Windows segédprogram M3U/M3U8 lejátszási listákban szereplő helyi zenefájlok másolására, az eredeti fájlnevek megtartásával.
 
-## Funkciók
-- Lista behúzása / hozzáadása után azonnal megmutatja a tartalmát: hány bejegyzés van benne, ebből hányat tudott beolvasni (megtalált fájl), hány hiányzik, és a méretüket.
-- Soronként látszik az állapot (OK / HIÁNYZIK / NEM HELYI / MAPPA / HIBA); szűrhető a hiányzókra.
-- Több lista egyszerre, összesítéssel; kódolás automatikus felismerése vagy kézi választása (a tartalom ilyenkor újraszámolódik).
-- Másolás eredeti fájlnevekkel, almappa listánként (opcionális), napló a célmappában.
-- Azonos nevű fájl a célmappában: a program a TARTALMAT hasonlítja össze (bájtonként), nem a méretet/dátumot. Azonos tartalomnál kihagyja ("MEGVAN"), eltérőnél `név (2)` néven menti – felülírás soha nincs, és ismételt futtatásnál nem halmozódnak a másolatok.
-- Opcionális "Ellenőrzés másolás után": a másolat tartalmát visszaolvasva összeveti a forrással; eltérésnél törli a másolatot és hibát jelez. (Méretellenőrzés mindig van.)
-- A befejezés állapota külön szerepel a naplóban: KÉSZ / BEFEJEZVE (nem minden bejegyzés másolható / hibákkal) / MEGSZAKÍTVA / LEÁLLT. A naplófájl mentési hibáját is jelzi.
+The Windows utility copies local audio files referenced by M3U/M3U8 playlists while preserving their original filenames.
 
-## Fájlok
-- `core.go` – lista beolvasása, kódolás-felismerés, útvonal-feloldás, másolás (platformfüggetlen, tesztelhető)
-- `analyze.go` – a lista elemzése másolás nélkül (bejegyzések állapota, összegzés)
-- `core_test.go` – egységtesztek (`go test ./...`)
-- `decode_windows.go` / `other.go` – ANSI kódlapok dekódolása (Windows: MultiByteToWideChar; máshol csak a tesztekhez)
-- `gui_windows.go` – az ablakos felület (tiszta Win32, külső függőség nélkül); itt a `version` változó a verziószám
-- `rsrc_windows_amd64.syso` – beágyazott ikon, verzióinfó, manifest (a `tools/make_res.py` állítja elő)
-- `tools/make_res.py` – az ikont (Pillow-val rajzolja), a verzióinfót és a manifestet generálja .syso-ba
-- `build.sh` / `build.bat` – fordítás
+Funkciók | Features
+Magyar
+M3U/M3U8 listák hozzáadása vagy behúzása, a tartalom azonnali elemzésével.
+Összesítés a bejegyzések számáról, a megtalált és hiányzó fájlokról, valamint a fájlméretekről.
+Bejegyzésenkénti állapot: OK / HIÁNYZIK / NEM HELYI / MAPPA / HIBA.
+A hiányzó fájlok szűrése.
+Több lejátszási lista egyidejű kezelése és összesített eredmény.
+Automatikus kódolásfelismerés vagy kézi kódolásválasztás.
+Másolás az eredeti fájlnevekkel, opcionálisan listánként külön almappába.
+Napló mentése a célmappába.
+Névütközés esetén a fájlok tartalmát bájtonként hasonlítja össze, nem csak a méretet vagy dátumot.
+Azonos tartalom esetén kihagyja a fájlt; eltérő tartalom esetén új nevet ad, például track (2).mp3. Meglévő fájlokat soha nem ír felül.
+Opcionális másolás utáni tartalomellenőrzés. Eltérés esetén törli a másolatot és hibát jelez. Méretellenőrzés mindig van.
+A befejezési állapot és a naplófájl mentésének esetleges hibája is megjelenik.
+English
+Add or drag-and-drop M3U/M3U8 playlists and analyze their contents immediately.
+Summary of entries, found and missing files, and file sizes.
+Per-entry status: OK / MISSING / NOT LOCAL / FOLDER / ERROR.
+Filter missing files.
+Process multiple playlists at once and view a combined summary.
+Automatic encoding detection or manual encoding selection.
+Copy files using their original filenames, optionally into a separate subfolder for each playlist.
+Save a log in the destination folder.
+On filename conflicts, compare file contents byte by byte—not just file size or date.
+Skip files with identical content. If content differs, save under a new name, such as track (2).mp3. Existing files are never overwritten.
+Optional content verification after copying. If a mismatch is detected, the copy is deleted and an error is reported. File size is always checked.
+The final operation status and any log-saving error are reported.
+Letöltés | Download
+Legújabb kiadás letöltése | Download the latest release
 
-## Fordítás
-Csak Go 1.21+ kell: `build.bat` (Windows) vagy `./build.sh` (Linux/macOS), opcionális argumentum a verzió, pl. `build.bat 1.2.0`.
-Verzió- vagy ikonváltáshoz Python 3 + Pillow kell (`pip install pillow`); nélküle a mellékelt .syso marad.
-Kézzel: `go build -trimpath -ldflags "-H windowsgui -s -w -X main.version=1.2.0" -o PlaylistMasolo.exe .` (GOOS=windows)
+Rendszerkövetelmények | Requirements
+Windows 10 vagy újabb.
 
-Futtatáshoz Windows 10 vagy újabb kell.
+A kiadott program futtatásához Go telepítése nem szükséges.
+
+Windows 10 or later.
+
+Go is not required to run the released executable.
+
+Fordítás forráskódból | Build from source
+A fordításhoz Go 1.21 vagy újabb szükséges.
+
+Go 1.21 or later is required to build the project.
+
+Windows:
+
+bat
+
+
+build.bat
+Linux/macOS:
+
+Bash
+
+
+./build.sh
+Opcionális verziószám is megadható, például build.bat 1.2.0.
+
+An optional version number can be provided, for example build.bat 1.2.0.
+
+A verzió- vagy ikonforrás frissítéséhez Python 3 és Pillow szükséges:
+
+Bash
+
+
+pip install pillow
+Python 3 and Pillow are required only to regenerate version or icon resources:
+
+Bash
+
+
+pip install pillow
+Tesztek | Tests
+Go egységtesztek:
+
+Bash
+
+
+go test ./...
+Run the Go unit tests:
+
+Bash
+
+
+go test ./...
+Hibajelentés | Issues
+Hibák és javaslatok jelentéséhez használd a GitHub Issues oldalt.
+
+Please use GitHub Issues for bug reports and suggestions.
+
+Készítette: DJMTools | Created by DJMTools
